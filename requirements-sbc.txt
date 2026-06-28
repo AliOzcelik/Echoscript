@@ -1,0 +1,55 @@
+# ============================================================================
+# requirements-sbc.txt — Scenario 2 (tiny SBC: Raspberry Pi 5 / Jetson Orin)
+# Fully local, batch. Deliberately AVOIDS torch + pyannote (too heavy for ARM
+# CPU). Diarization runs on sherpa-onnx (ONNX, no PyTorch).
+#
+# System prerequisite (NOT pip): ffmpeg
+#   sudo apt install ffmpeg
+#
+# Install order on a Pi:
+#   pip install -r requirements-sbc.txt
+# On Jetson, see the CUDA notes at the bottom — do NOT use plain pip for the
+# GPU builds of onnxruntime / llama-cpp-python.
+# ============================================================================
+
+# --- Core / audio I/O -------------------------------------------------------
+numpy>=1.24,<2.0
+soundfile>=0.12
+librosa>=0.10
+pydub>=0.25
+scipy>=1.10
+PyYAML>=6.0
+
+# --- [4] ASR ----------------------------------------------------------------
+# faster-whisper works on ARM CPU (int8). Alternatively build whisper.cpp
+# natively (better NEON perf) and call its binary — that is NOT a pip package.
+faster-whisper>=1.0
+# ctranslate2>=4.0,<5.0   # uncomment/pin if you hit ABI mismatches on ARM
+
+# --- [3] Diarization (ONNX, no torch) ---------------------------------------
+sherpa-onnx>=1.10         # offline speaker diarization (segmentation + embeddings)
+onnxruntime>=1.17         # CPU ONNX runtime (Pi). Jetson: see CUDA notes below.
+
+# --- [2] VAD ----------------------------------------------------------------
+webrtcvad>=2.0.10         # lightweight, no torch
+
+# --- [6] Local LLM ----------------------------------------------------------
+# Pi 5: CPU build below. Use a small quantized model (1.5B–3B, Q4_K_M).
+llama-cpp-python>=0.2.80
+huggingface-hub>=0.23
+
+# --- CLI / UX ---------------------------------------------------------------
+typer>=0.12
+rich>=13.0
+
+# ============================================================================
+# JETSON ORIN (CUDA) — do these MANUALLY, not via the lines above:
+#
+#  1. onnxruntime-gpu: use NVIDIA's Jetson wheel (the PyPI onnxruntime-gpu
+#     wheel is x86-only). See NVIDIA Jetson Zoo.
+#  2. llama-cpp-python with CUDA:
+#       CMAKE_ARGS="-DGGML_CUDA=on" pip install --force-reinstall \
+#           --no-cache-dir llama-cpp-python
+#  3. faster-whisper GPU: ctranslate2 must be a CUDA-enabled build for ARM;
+#     otherwise fall back to whisper.cpp built with -DGGML_CUDA=on.
+# ============================================================================
