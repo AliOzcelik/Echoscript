@@ -3,14 +3,6 @@
 **Project goal:** Take audio in → identify speakers → transcribe → summarize with a local
 LLM → output a speaker-labeled transcript ("notes") plus a structured summary.
 
-## Locked decisions (from planning Q&A)
-
-| Decision | Choice | Consequence |
-|---|---|---|
-| Privacy | **Fully local / offline only** | No audio or text ever leaves the device. Rules out cloud as a *shippable* path. |
-| Usage mode | **Batch** (record/upload, then process) | No streaming diarization needed → far simpler + lighter. |
-| Scenario 1 ("no hardware") | **Existing computer, CPU-only**, compared against a cloud baseline | Cloud is benchmarked for accuracy reference, **not** shipped (violates privacy). |
-| Scenario 2 ("minimal hardware") | **Tiny SBC** (Raspberry Pi 5 or Jetson Orin Nano) | Fully local, low power. Jetson recommended; Pi is the floor. |
 
 ## The pipeline (same for both scenarios)
 
@@ -23,6 +15,17 @@ LLM → output a speaker-labeled transcript ("notes") plus a structured summary.
 [6] Summarize   local LLM → summary, action items, decisions
                 → OUTPUT: transcript.md (notes) + summary.md
 ```
+
+
+## Locked decisions (from planning Q&A)
+
+| Decision | Choice | Consequence |
+|---|---|---|
+| Privacy | **Fully local / offline only** | No audio or text ever leaves the device. Rules out cloud as a *shippable* path. |
+| Usage mode | **Batch** (record/upload, then process) | No streaming diarization needed → far simpler + lighter. |
+| Scenario 1 ("no hardware") | **Existing computer, CPU-only**, compared against a cloud baseline | Cloud is benchmarked for accuracy reference, **not** shipped (violates privacy). |
+| Scenario 2 ("minimal hardware") | **Tiny SBC** (Raspberry Pi 5 or Jetson Orin Nano) | Fully local, low power. Jetson recommended; Pi is the floor. |
+
 
 Hardest stages: **[3] diarization** (heaviest, accuracy-sensitive) and **[6] LLM**
 (most RAM-hungry). [4] ASR is cheap and solved.
