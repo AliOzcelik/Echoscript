@@ -1,0 +1,34 @@
+# core / audio I/O
+numpy
+soundfile
+librosa
+pydub
+scipy
+PyYAML
+# note: `dataclasses` is a Python built-in (3.7+) — no package to install
+
+# ASR
+# faster-whisper works on ARM CPU (int8)
+faster-whisper
+
+# diarization
+# sherpa-onnx for offline speaker diarization (segmentation + embedding)
+sherpa-onnx 
+onnxruntime
+
+# VAD
+webrtcvad
+# webrtcvad imports pkg_resources at import time; on Python 3.13+ setuptools
+# is no longer bundled, so install it explicitly or `import webrtcvad` fails.
+setuptools
+
+# web / backend (FastAPI app in main.py, real-time audio over WebSocket)
+fastapi
+uvicorn[standard]   # pulls in the `websockets` lib the /ws/audio endpoint needs
+
+# CLI/UX
+typer
+rich
+
+# LLM Inference
+llama-cpp-python
