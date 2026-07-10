@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Public+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f0e7;--surface:#fffdf8;--surface2:#efe8da;--border:#e5ddca;--text:#2b2620;--muted:#736a5c;--faint:#a99d88;--accent:#c2673b;--accent-soft:#f2e0d3;--accent-text:#fffdf8;--radius:14px;--shadow:0 1px 2px rgba(60,45,25,.06),0 10px 26px -14px rgba(60,45,25,.22);--font-display:'Newsreader',Georgia,serif;--font-body:'Public Sans',system-ui,sans-serif;--font-mono:'IBM Plex Mono',ui-monospace,monospace}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font-body);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+input,select{font-family:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input::placeholder{color:var(--faint)}
+::selection{background:var(--accent-soft)}
+@keyframes ec-spin{to{transform:rotate(360deg)}}
+@keyframes ec-fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes ec-dot{0%,100%{transform:scale(.6);opacity:.45}50%{transform:scale(1);opacity:1}}
+@keyframes ec-ring{0%{transform:scale(.85);opacity:.6}100%{transform:scale(1.55);opacity:0}}
+</style>
+</helmet>
+
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#c2673b"/><g fill="#fffdf8"><rect x="34" y="38" width="5" height="24" rx="2.5"/><rect x="43" y="28" width="5" height="44" rx="2.5"/><rect x="52" y="34" width="5" height="32" rx="2.5"/><rect x="61" y="42" width="5" height="16" rx="2.5"/></g></svg></template>
+<div ref="{{ rootRef }}" style="min-height:100vh;display:flex;background:var(--bg)">
+
+  <sc-if value="{{ showSidebar }}" hint-placeholder-val="{{ true }}">
+  <aside style="width:250px;flex:none;display:flex;flex-direction:column;gap:6px;padding:22px 18px;background:var(--surface);border-right:1px solid var(--border);position:sticky;top:0;height:100vh">
+    <div style="display:flex;align-items:center;gap:11px;padding:4px 6px 20px">
+      <div style="width:38px;height:38px;border-radius:11px;background:var(--accent);display:flex;align-items:center;justify-content:center;gap:2.5px;flex:none">
+        <span style="width:3px;height:11px;border-radius:2px;background:var(--accent-text)"></span>
+        <span style="width:3px;height:19px;border-radius:2px;background:var(--accent-text)"></span>
+        <span style="width:3px;height:14px;border-radius:2px;background:var(--accent-text)"></span>
+      </div>
+      <div style="display:flex;flex-direction:column;line-height:1.15">
+        <span style="font-family:var(--font-display);font-weight:600;font-size:19px;letter-spacing:-.01em">Echoscript</span>
+        <span style="font-size:11px;color:var(--muted)">{{ t.tagline }}</span>
+      </div>
+    </div>
+    <button onClick="{{ goMeetings }}" style="display:flex;align-items:center;gap:12px;width:100%;padding:11px 12px;border-radius:11px;font-size:14px;font-weight:600;background:{{ navMeet.bg }};color:{{ navMeet.fg }}">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+      {{ t.nav_meetings }}
+    </button>
+    <button onClick="{{ goNew }}" style="display:flex;align-items:center;gap:12px;width:100%;padding:11px 12px;border-radius:11px;font-size:14px;font-weight:600;background:{{ navNew.bg }};color:{{ navNew.fg }}">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+      {{ t.nav_new }}
+    </button>
+    <div style="flex:1"></div>
+    <div style="display:flex;align-items:center;gap:11px;padding:12px;border-radius:12px;background:var(--surface2);border:1px solid var(--border)">
+      <span style="position:relative;width:9px;height:9px;flex:none"><span style="position:absolute;inset:0;border-radius:50%;background:#3a9142;animation:ec-dot 2s ease-in-out infinite"></span></span>
+      <div style="display:flex;flex-direction:column;line-height:1.3">
+        <span style="font-size:12.5px;font-weight:600">Raspberry Pi 5</span>
+        <span style="font-size:11px;color:var(--muted)">{{ t.device_status }}</span>
+      </div>
+    </div>
+  </aside>
+  </sc-if>
+
+  <div style="flex:1;min-width:0;display:flex;flex-direction:column;min-height:100vh">
+    <header style="position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:14px;padding:14px 22px;min-height:66px;background:color-mix(in srgb, var(--bg) 80%, transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--border)">
+
+      <div style="flex:1;min-width:0;display:flex;align-items:center;gap:12px">
+        <sc-if value="{{ isLibrary }}" hint-placeholder-val="{{ true }}"><h1 style="font-family:var(--font-display);font-weight:600;font-size:22px;margin:0;letter-spacing:-.01em">{{ t.meetings_title }}</h1></sc-if>
+        <sc-if value="{{ isCapture }}" hint-placeholder-val="{{ false }}"><h1 style="font-family:var(--font-display);font-weight:600;font-size:22px;margin:0;letter-spacing:-.01em">{{ t.new_title }}</h1></sc-if>
+        <sc-if value="{{ isProcessing }}" hint-placeholder-val="{{ false }}"><h1 style="font-family:var(--font-display);font-weight:600;font-size:22px;margin:0;letter-spacing:-.01em">{{ t.nav_new }}</h1></sc-if>
+        <sc-if value="{{ isReview }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:12px;min-width:0">
+            <button onClick="{{ goMeetings }}" title="{{ t.back_word }}" style="width:34px;height:34px;flex:none;border-radius:10px;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center" style-hover="background:var(--surface2)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <div style="display:flex;flex-direction:column;line-height:1.2;min-width:0">
+              <span style="font-family:var(--font-display);font-weight:600;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ meetingTitle }}</span>
+              <span style="font-size:11.5px;color:var(--muted)">{{ meetingMeta }}</span>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px;flex:none">
+        <div style="display:flex;align-items:center;gap:4px;padding:3px;border-radius:10px;background:var(--surface2);border:1px solid var(--border)">
+          <sc-for list="{{ directions }}" as="d" hint-placeholder-count="3">
+            <button onClick="{{ d.onPick }}" title="{{ d.label }}" style="width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;border:1.5px solid {{ d.ring }}">
+              <span style="width:13px;height:13px;border-radius:50%;background:{{ d.dot }}"></span>
+            </button>
+          </sc-for>
+        </div>
+        <div style="display:flex;align-items:center;padding:3px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);font-size:12px;font-weight:700;letter-spacing:.03em">
+          <button onClick="{{ setEn }}" style="padding:5px 10px;border-radius:7px;background:{{ langEn.bg }};color:{{ langEn.fg }}">EN</button>
+          <button onClick="{{ setTr }}" style="padding:5px 10px;border-radius:7px;background:{{ langTr.bg }};color:{{ langTr.fg }}">TR</button>
+        </div>
+        <button onClick="{{ toggleTheme }}" title="{{ t.theme_word }}" style="width:36px;height:36px;border-radius:10px;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center" style-hover="background:var(--surface2)">
+          <sc-if value="{{ isDark }}" hint-placeholder-val="{{ false }}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.4 1.4M17.6 17.6L19 19M19 5l-1.4 1.4M6.4 17.6L5 19"/></svg>
+          </sc-if>
+          <sc-if value="{{ isLight }}" hint-placeholder-val="{{ true }}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+          </sc-if>
+        </button>
+      </div>
+    </header>
+
+    <main style="flex:1;padding:26px 22px 40px;overflow-x:hidden">
+
+      <!-- ===================== LIBRARY ===================== -->
+      <sc-if value="{{ isLibrary }}" hint-placeholder-val="{{ true }}">
+      <div style="max-width:1040px;margin:0 auto;animation:ec-fade .3s ease both">
+        <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:22px">
+          <div style="flex:1;min-width:200px;display:flex;align-items:center;gap:9px;padding:10px 14px;border-radius:11px;background:var(--surface);border:1px solid var(--border)">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--faint)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+            <input value="{{ query }}" onInput="{{ onSearch }}" placeholder="{{ t.lib_search }}" style="flex:1;border:none;background:none;outline:none;font-size:14px;color:var(--text)"/>
+          </div>
+          <button onClick="{{ goNew }}" style="display:flex;align-items:center;gap:8px;padding:11px 16px;border-radius:11px;background:var(--accent);color:var(--accent-text);font-size:14px;font-weight:600;box-shadow:var(--shadow)" style-hover="filter:brightness(1.05)">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            {{ t.nav_new }}
+          </button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px">
+          <sc-for list="{{ meetings }}" as="m" hint-placeholder-count="6">
+            <button onClick="{{ m.onOpen }}" style="text-align:left;padding:18px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--border);cursor:{{ m.cursor }};display:flex;flex-direction:column;gap:14px;transition:transform .15s,box-shadow .15s" style-hover="box-shadow:var(--shadow);transform:translateY(-2px)">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+                <span style="font-family:var(--font-display);font-weight:600;font-size:17px;line-height:1.25;letter-spacing:-.01em">{{ m.title }}</span>
+                <span style="flex:none;display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:999px;font-size:11px;font-weight:600;background:{{ m.stSoft }};color:{{ m.stColor }}">
+                  <span style="width:6px;height:6px;border-radius:50%;background:{{ m.stColor }}"></span>{{ m.stLabel }}
+                </span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+                <span style="font-size:12.5px;color:var(--muted)">{{ m.metaLine }}</span>
+                <div style="display:flex">
+                  <sc-for list="{{ m.dots }}" as="c" hint-placeholder-count="3">
+                    <span style="width:18px;height:18px;border-radius:50%;background:{{ c }};border:2px solid var(--surface);margin-left:-6px"></span>
+                  </sc-for>
+                </div>
+              </div>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===================== CAPTURE ===================== -->
+      <sc-if value="{{ isCapture }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:640px;margin:0 auto;animation:ec-fade .3s ease both">
+        <div style="display:flex;padding:4px;border-radius:12px;background:var(--surface2);border:1px solid var(--border);margin-bottom:22px">
+          <button onClick="{{ setRecordMode }}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;border-radius:9px;font-size:14px;font-weight:600;background:{{ capRec.bg }};color:{{ capRec.fg }}">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+            {{ t.cap_record }}
+          </button>
+          <button onClick="{{ setUploadMode }}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;border-radius:9px;font-size:14px;font-weight:600;background:{{ capUp.bg }};color:{{ capUp.fg }}">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+            {{ t.cap_upload }}
+          </button>
+        </div>
+
+        <div style="padding:30px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--border)">
+          <sc-if value="{{ isRecord }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:20px">
+            <div style="position:relative;width:128px;height:128px;display:flex;align-items:center;justify-content:center">
+              <sc-if value="{{ recording }}" hint-placeholder-val="{{ false }}">
+                <span style="position:absolute;width:104px;height:104px;border-radius:50%;background:var(--accent);animation:ec-ring 1.6s ease-out infinite"></span>
+              </sc-if>
+              <button onClick="{{ toggleRec }}" style="position:relative;width:100px;height:100px;border-radius:50%;background:var(--accent);color:var(--accent-text);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow)">
+                <sc-if value="{{ recording }}" hint-placeholder-val="{{ false }}"><span style="width:30px;height:30px;border-radius:7px;background:var(--accent-text)"></span></sc-if>
+                <sc-if value="{{ notRecording }}" hint-placeholder-val="{{ true }}"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></sc-if>
+              </button>
+            </div>
+            <div style="font-family:var(--font-mono);font-size:26px;font-weight:500;letter-spacing:.02em">{{ recTimeStr }}</div>
+            <div style="display:flex;align-items:center;gap:2.5px;height:52px">
+              <sc-for list="{{ recBars }}" as="b" hint-placeholder-count="44">
+                <span style="width:3px;border-radius:2px;background:{{ b.color }};height:{{ b.h }}%"></span>
+              </sc-for>
+            </div>
+            <p style="margin:0;text-align:center;font-size:13px;color:var(--muted);max-width:340px">
+              <sc-if value="{{ recording }}" hint-placeholder-val="{{ false }}"><span>{{ t.cap_recording }}</span></sc-if>
+              <sc-if value="{{ notRecording }}" hint-placeholder-val="{{ true }}"><span>{{ t.cap_rec_hint }}</span></sc-if>
+            </p>
+          </div>
+          </sc-if>
+
+          <sc-if value="{{ isUpload }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ browseUpload }}" style="width:100%;display:flex;flex-direction:column;align-items:center;gap:12px;padding:44px 20px;border-radius:var(--radius);border:2px dashed var(--border);background:var(--surface2);text-align:center" style-hover="border-color:var(--accent)">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+            <span style="font-size:15px;font-weight:600">{{ t.cap_drop }}</span>
+            <span style="font-size:13px;color:var(--accent);font-weight:600">{{ t.cap_browse }}</span>
+            <span style="font-size:12px;color:var(--faint)">{{ t.cap_formats }}</span>
+          </button>
+          </sc-if>
+
+          <div style="margin-top:26px;padding-top:22px;border-top:1px solid var(--border)">
+            <label style="display:block;font-size:12.5px;font-weight:600;margin-bottom:8px">{{ t.cap_lang }}</label>
+            <select value="{{ meetingLang }}" onChange="{{ onMeetingLang }}" style="width:100%;padding:11px 13px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:14px;outline:none">
+              <option value="auto">Auto-detect</option>
+              <option value="en">English</option>
+              <option value="tr">Türkçe</option>
+            </select>
+            <p style="margin:9px 0 0;font-size:11.5px;color:var(--faint);line-height:1.5">{{ t.cap_lang_note }}</p>
+          </div>
+        </div>
+
+        <sc-if value="{{ captured }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:16px;display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--border);animation:ec-fade .25s ease both">
+          <span style="width:40px;height:40px;flex:none;border-radius:50%;background:color-mix(in srgb, #3a9142 16%, transparent);display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3a9142" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.3">
+            <span style="font-size:14px;font-weight:600">{{ t.cap_captured }}</span>
+            <span style="font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ capturedName }}</span>
+          </div>
+          <button onClick="{{ startProcessing }}" style="flex:none;padding:10px 16px;border-radius:10px;background:var(--accent);color:var(--accent-text);font-size:13.5px;font-weight:600" style-hover="filter:brightness(1.05)">{{ t.cap_process }}</button>
+        </div>
+        </sc-if>
+      </div>
+      </sc-if>
+
+      <!-- ===================== PROCESSING ===================== -->
+      <sc-if value="{{ isProcessing }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:620px;margin:0 auto;animation:ec-fade .3s ease both">
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 15px;border-radius:11px;background:var(--accent-soft);color:var(--accent);font-size:12.5px;font-weight:500;margin-bottom:22px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          {{ t.proc_note }}
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <sc-for list="{{ stages }}" as="s" hint-placeholder-count="6">
+            <div style="display:flex;align-items:center;gap:14px;padding:13px 15px;border-radius:12px;background:{{ s.rowBg }};border:1px solid {{ s.rowBorder }}">
+              <span style="width:30px;height:30px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;background:{{ s.iconBg }};color:{{ s.iconFg }}">
+                <sc-if value="{{ s.isDone }}" hint-placeholder-val="{{ false }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></sc-if>
+                <sc-if value="{{ s.isActive }}" hint-placeholder-val="{{ false }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" style="animation:ec-spin .8s linear infinite"><path d="M21 12a9 9 0 1 1-6.2-8.5"/></svg></sc-if>
+                <sc-if value="{{ s.isIdle }}" hint-placeholder-val="{{ true }}"><span style="width:7px;height:7px;border-radius:50%;background:currentColor"></span></sc-if>
+              </span>
+              <div style="flex:1;min-width:0">
+                <div style="display:flex;justify-content:space-between;gap:10px;margin-bottom:6px">
+                  <span style="font-size:14px;font-weight:600;color:{{ s.labelColor }}">{{ s.label }}</span>
+                  <span style="font-size:11.5px;color:var(--faint)">{{ s.sub }}</span>
+                </div>
+                <div style="height:5px;border-radius:3px;background:var(--surface2);overflow:hidden"><span style="display:block;height:100%;border-radius:3px;background:var(--accent);width:{{ s.fill }};transition:width .2s linear"></span></div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="margin-top:16px;padding:14px 16px;border-radius:11px;background:var(--surface);border:1px solid var(--border);font-family:var(--font-mono);font-size:11.5px;line-height:1.9;color:var(--muted);max-height:150px;overflow:auto">
+          <sc-for list="{{ procLogs }}" as="l" hint-placeholder-count="1">
+            <div><span style="color:var(--faint)">›</span> {{ l }}</div>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ procDone }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:18px;display:flex;align-items:center;gap:14px;padding:18px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--border);animation:ec-fade .3s ease both">
+          <span style="width:44px;height:44px;flex:none;border-radius:50%;background:color-mix(in srgb, #3a9142 16%, transparent);display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3a9142" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.3">
+            <span style="font-size:15px;font-weight:600">{{ t.proc_done }}</span>
+            <span style="font-size:12.5px;color:var(--muted)">{{ t.proc_done_sub }}</span>
+          </div>
+          <button onClick="{{ goReviewResults }}" style="flex:none;padding:11px 18px;border-radius:10px;background:var(--accent);color:var(--accent-text);font-size:14px;font-weight:600" style-hover="filter:brightness(1.05)">{{ t.proc_view }}</button>
+        </div>
+        </sc-if>
+      </div>
+      </sc-if>
+
+      <!-- ===================== REVIEW ===================== -->
+      <sc-if value="{{ isReview }}" hint-placeholder-val="{{ false }}">
+      <div style="position:relative;max-width:1220px;margin:0 auto;animation:ec-fade .3s ease both">
+        <div style="width:100%">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px">
+          <div style="display:flex;padding:4px;border-radius:11px;background:var(--surface2);border:1px solid var(--border)">
+            <button onClick="{{ setTabT }}" style="padding:8px 16px;border-radius:8px;font-size:13.5px;font-weight:600;background:{{ tabT.bg }};color:{{ tabT.fg }}">{{ t.tab_transcript }}</button>
+            <button onClick="{{ setTabS }}" style="padding:8px 16px;border-radius:8px;font-size:13.5px;font-weight:600;background:{{ tabS.bg }};color:{{ tabS.fg }}">{{ t.tab_summary }}</button>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button onClick="{{ toggleSpeakers }}" style="display:flex;align-items:center;gap:7px;padding:9px 13px;border-radius:10px;border:1px solid {{ spToggle.bd }};background:{{ spToggle.bg }};color:{{ spToggle.fg }};font-size:12.5px;font-weight:600" style-hover="border-color:var(--accent)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3.1a4 4 0 0 1 0 7.8"/><path d="M21 21v-2a4 4 0 0 0-3-3.9"/><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
+              {{ t.sp_panel_title }}
+            </button>
+            <button onClick="{{ exportTranscript }}" style="display:flex;align-items:center;gap:7px;padding:9px 13px;border-radius:10px;border:1px solid var(--border);background:var(--surface);font-size:12.5px;font-weight:600;font-family:var(--font-mono)" style-hover="background:var(--surface2)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+              {{ t.export_transcript }}
+            </button>
+            <button onClick="{{ exportSummary }}" style="display:flex;align-items:center;gap:7px;padding:9px 13px;border-radius:10px;border:1px solid var(--border);background:var(--surface);font-size:12.5px;font-weight:600;font-family:var(--font-mono)" style-hover="background:var(--surface2)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+              {{ t.export_summary }}
+            </button>
+          </div>
+        </div>
+
+        <div style="padding-right:{{ contentPadRight }};transition:padding-right .22s ease">
+        <!-- TRANSCRIPT TAB -->
+        <sc-if value="{{ isTabT }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <sc-for list="{{ utterances }}" as="u" hint-placeholder-count="8">
+            <div style="padding:11px 14px;border-radius:12px" style-hover="background:var(--surface)">
+              <div style="display:flex;align-items:baseline;gap:9px;margin-bottom:3px">
+                <span style="font-size:14px;font-weight:700;color:{{ u.dot }}">{{ u.name }}</span>
+                <span style="font-size:11px;color:var(--faint);font-family:var(--font-mono)">{{ u.ts }}</span>
+              </div>
+              <p style="margin:0;font-size:14.5px;line-height:1.65;color:var(--text)">{{ u.text }}</p>
+            </div>
+          </sc-for>
+        </div>
+        </sc-if>
+
+        <!-- SUMMARY TAB -->
+        <sc-if value="{{ isTabS }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:16px;max-width:760px">
+          <div style="padding:22px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--border)">
+            <div style="display:flex;align-items:center;gap:9px;margin-bottom:12px">
+              <span style="width:8px;height:8px;border-radius:50%;background:var(--accent)"></span>
+              <h2 style="font-family:var(--font-display);font-weight:600;font-size:18px;margin:0">{{ t.sum_overview }}</h2>
+            </div>
+            <p style="margin:0;font-size:15px;line-height:1.65;color:var(--text)">{{ sumOverview }}</p>
+          </div>
+
+          <div style="padding:22px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--border)">
+            <div style="display:flex;align-items:center;gap:9px;margin-bottom:14px">
+              <span style="width:8px;height:8px;border-radius:50%;background:var(--accent)"></span>
+              <h2 style="font-family:var(--font-display);font-weight:600;font-size:18px;margin:0">{{ t.sum_key }}</h2>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:11px">
+              <sc-for list="{{ sumKey }}" as="k" hint-placeholder-count="5">
+                <div style="display:flex;gap:11px;align-items:flex-start">
+                  <span style="width:6px;height:6px;flex:none;border-radius:50%;background:var(--faint);margin-top:8px"></span>
+                  <span style="font-size:14.5px;line-height:1.55">{{ k }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="padding:22px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--border)">
+            <div style="display:flex;align-items:center;gap:9px;margin-bottom:14px">
+              <span style="width:8px;height:8px;border-radius:50%;background:var(--accent)"></span>
+              <h2 style="font-family:var(--font-display);font-weight:600;font-size:18px;margin:0">{{ t.sum_decisions }}</h2>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:11px">
+              <sc-for list="{{ sumDecisions }}" as="d" hint-placeholder-count="3">
+                <div style="display:flex;gap:11px;align-items:flex-start">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px"><path d="M20 6L9 17l-5-5"/></svg>
+                  <span style="font-size:14.5px;line-height:1.55">{{ d }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="padding:22px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--border)">
+            <div style="display:flex;align-items:center;gap:9px;margin-bottom:14px">
+              <span style="width:8px;height:8px;border-radius:50%;background:var(--accent)"></span>
+              <h2 style="font-family:var(--font-display);font-weight:600;font-size:18px;margin:0">{{ t.sum_actions }}</h2>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <sc-for list="{{ sumActions }}" as="a" hint-placeholder-count="3">
+                <div style="display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:11px;background:var(--surface2)">
+                  <span style="flex:none;display:inline-flex;align-items:center;gap:7px;padding:5px 11px 5px 6px;border-radius:999px;background:{{ a.soft }};color:{{ a.dot }};font-size:12.5px;font-weight:700">
+                    <span style="width:20px;height:20px;border-radius:50%;background:{{ a.dot }};color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-family:var(--font-mono)">{{ a.initials }}</span>{{ a.name }}
+                  </span>
+                  <span style="flex:1;font-size:14px;line-height:1.5">{{ a.text }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+        </sc-if>
+        </div>
+        </div>
+
+        <sc-if value="{{ speakersOpen }}" hint-placeholder-val="{{ true }}">
+        <aside style="position:absolute;top:60px;right:0;width:300px;max-width:calc(100% - 4px);z-index:20;display:flex;flex-direction:column;gap:12px;padding:16px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--border);box-shadow:0 16px 44px -14px rgba(0,0,0,.4);max-height:calc(100vh - 150px);overflow:auto">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+            <div style="display:flex;flex-direction:column;gap:2px">
+              <h2 style="font-family:var(--font-display);font-weight:600;font-size:17px;margin:0">{{ t.sp_panel_title }}</h2>
+              <span style="font-size:12px;color:var(--muted)">{{ t.sp_panel_hint }}</span>
+            </div>
+            <button onClick="{{ toggleSpeakers }}" title="{{ t.sp_close }}" style="width:30px;height:30px;flex:none;border-radius:8px;border:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:center" style-hover="background:var(--border)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <sc-for list="{{ speakers }}" as="sp" hint-placeholder-count="3">
+            <div style="padding:14px;border-radius:12px;background:var(--surface2);border:1px solid var(--border);display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;align-items:center;gap:11px">
+                <span style="width:32px;height:32px;flex:none;border-radius:50%;background:{{ sp.soft }};color:{{ sp.dot }};display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;font-family:var(--font-mono)">{{ sp.initials }}</span>
+                <input value="{{ sp.name }}" onInput="{{ sp.onName }}" placeholder="{{ sp.placeholder }}" style="flex:1;min-width:0;border:none;background:none;outline:none;font-size:15px;font-weight:600;color:var(--text);border-bottom:1.5px solid var(--border);padding:3px 0" style-focus="border-bottom-color:var(--accent)"/>
+                <span style="flex:none;font-size:11px;color:var(--faint);font-family:var(--font-mono)">{{ sp.turnsLabel }}</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <button onClick="{{ sp.onPlay }}" style="width:34px;height:34px;flex:none;border-radius:50%;background:{{ sp.dot }};color:#fff;display:flex;align-items:center;justify-content:center">
+                  <sc-if value="{{ sp.isPlaying }}" hint-placeholder-val="{{ false }}"><span style="display:flex;gap:3px"><span style="width:3px;height:12px;border-radius:1px;background:#fff"></span><span style="width:3px;height:12px;border-radius:1px;background:#fff"></span></span></sc-if>
+                  <sc-if value="{{ sp.notPlaying }}" hint-placeholder-val="{{ true }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="#fff" stroke="none"><path d="M8 5v14l11-7z"/></svg></sc-if>
+                </button>
+                <div style="flex:1;display:flex;align-items:center;gap:2px;height:26px">
+                  <sc-for list="{{ sp.bars }}" as="bb" hint-placeholder-count="26">
+                    <span style="flex:1;border-radius:1.5px;background:{{ bb.color }};height:{{ bb.h }}%"></span>
+                  </sc-for>
+                </div>
+                <span style="flex:none;font-size:11px;color:var(--muted);font-family:var(--font-mono)">{{ sp.playLabel }}</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:7px">
+                <span style="font-size:11px;color:var(--faint)">{{ t.sp_color }}</span>
+                <div style="display:flex;gap:6px">
+                  <sc-for list="{{ sp.swatches }}" as="sw" hint-placeholder-count="6">
+                    <button onClick="{{ sw.onPick }}" style="width:18px;height:18px;border-radius:50%;background:{{ sw.dot }};border:2px solid {{ sw.ring }};outline:2px solid {{ sw.outline }}"></button>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+        </aside>
+        </sc-if>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ showBottomNav }}" hint-placeholder-val="{{ false }}"><div style="height:74px"></div></sc-if>
+    </main>
+  </div>
+
+  <sc-if value="{{ showBottomNav }}" hint-placeholder-val="{{ false }}">
+  <nav style="position:fixed;bottom:0;left:0;right:0;z-index:40;display:flex;gap:6px;padding:10px 16px;background:color-mix(in srgb, var(--surface) 92%, transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--border)">
+    <button onClick="{{ goMeetings }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px;border-radius:10px;font-size:11px;font-weight:600;color:{{ navMeet.fg2 }}">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+      {{ t.nav_meetings }}
+    </button>
+    <button onClick="{{ goNew }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px;border-radius:10px;font-size:11px;font-weight:600;color:{{ navNew.fg2 }}">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+      {{ t.nav_new }}
+    </button>
+  </nav>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:880},&quot;direction&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;studio&quot;,&quot;signal&quot;,&quot;aurora&quot;],&quot;default&quot;:&quot;studio&quot;,&quot;tsType&quot;:&quot;'studio'|'signal'|'aurora'&quot;,&quot;section&quot;:&quot;Appearance&quot;},&quot;mode&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;'light'|'dark'&quot;,&quot;section&quot;:&quot;Appearance&quot;},&quot;lang&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;en&quot;,&quot;tr&quot;],&quot;default&quot;:&quot;en&quot;,&quot;tsType&quot;:&quot;'en'|'tr'&quot;,&quot;section&quot;:&quot;Appearance&quot;}}">
+class Component extends DCLogic {
+  SPCOL = {
+    light: ['#d64545','#0f9488','#7c4dff','#c07800','#2563c9','#3a9142'],
+    dark:  ['#ff7b7b','#34d0c0','#b39bff','#f0b64a','#6aa6ff','#6fd47a']
+  };
+
+  TOK = {
+    studio: { label:'Studio', radius:'14px', fd:"'Newsreader',Georgia,serif", fb:"'Public Sans',system-ui,sans-serif", fm:"'IBM Plex Mono',ui-monospace,monospace",
+      light:{ bg:'#f4f0e7',surface:'#fffdf8',surface2:'#efe8da',border:'#e5ddca',text:'#2b2620',muted:'#736a5c',faint:'#a99d88',accent:'#c2673b',accentSoft:'#f2e0d3',accentText:'#fffdf8',shadow:'0 1px 2px rgba(60,45,25,.06),0 10px 26px -14px rgba(60,45,25,.22)' },
+      dark:{ bg:'#17130e',surface:'#211b14',surface2:'#2b231a',border:'#3a3025',text:'#f2ece0',muted:'#b3a897',faint:'#7d7263',accent:'#e08a5a',accentSoft:'#3a2a1e',accentText:'#17130e',shadow:'0 1px 2px rgba(0,0,0,.4),0 14px 32px -16px rgba(0,0,0,.7)' } },
+    signal: { label:'Signal', radius:'10px', fd:"'Space Grotesk',system-ui,sans-serif", fb:"'Public Sans',system-ui,sans-serif", fm:"'IBM Plex Mono',ui-monospace,monospace",
+      light:{ bg:'#eceff3',surface:'#ffffff',surface2:'#e7ebf1',border:'#d3dbe4',text:'#111826',muted:'#586173',faint:'#8792a3',accent:'#1f6feb',accentSoft:'#e2ecfe',accentText:'#ffffff',shadow:'0 1px 2px rgba(20,30,50,.06),0 12px 26px -14px rgba(20,30,50,.2)' },
+      dark:{ bg:'#0b0e13',surface:'#12171f',surface2:'#1a212c',border:'#232c38',text:'#e7edf5',muted:'#909cad',faint:'#5e6a7b',accent:'#3b8bff',accentSoft:'#122442',accentText:'#04070c',shadow:'0 1px 2px rgba(0,0,0,.5),0 14px 32px -16px rgba(0,0,0,.75)' } },
+    aurora: { label:'Aurora', radius:'18px', fd:"'Bricolage Grotesque',system-ui,sans-serif", fb:"'Instrument Sans',system-ui,sans-serif", fm:"'IBM Plex Mono',ui-monospace,monospace",
+      light:{ bg:'#f3f1fb',surface:'#ffffff',surface2:'#efeaff',border:'#e5e0f4',text:'#191531',muted:'#635d7d',faint:'#9992b5',accent:'#6d4aff',accentSoft:'#eae4ff',accentText:'#ffffff',shadow:'0 1px 2px rgba(40,25,80,.06),0 14px 30px -14px rgba(70,45,150,.28)' },
+      dark:{ bg:'#0e0c18',surface:'#171326',surface2:'#211c37',border:'#2d2749',text:'#efecff',muted:'#a49dc4',faint:'#6d6690',accent:'#8a6bff',accentSoft:'#241d40',accentText:'#0b0818',shadow:'0 1px 2px rgba(0,0,0,.5),0 16px 36px -18px rgba(0,0,0,.75)' } }
+  };
+
+  STR = {
+    en: { tagline:'On-device meeting notes', nav_meetings:'Meetings', nav_new:'New recording', device_status:'Offline · on-device', meetings_title:'Meetings', lib_search:'Search meetings', speakers_word:'speakers', st_done:'Ready', st_processing:'Processing', st_queued:'Queued', st_error:'Error', new_title:'New recording', cap_record:'Record', cap_upload:'Upload', cap_rec_hint:'Tap to start recording — audio never leaves this device.', cap_recording:'Recording…', cap_stop:'Stop', cap_rec_again:'Record again', cap_drop:'Drop an audio file here', cap_browse:'or browse files', cap_formats:'WAV, MP3, M4A · up to 2 hours', cap_lang:'Transcription language', cap_lang_note:'Sets the language of the transcript — separate from the interface language above.', cap_process:'Process on device', cap_captured:'Recording captured', proc_note:'Models load one at a time — nothing leaves this device.', proc_done:'Notes are ready', proc_done_sub:'Transcript and summary generated on device.', proc_view:'View results', stage_ingest:'Ingest', stage_ingest_sub:'Load & decode audio', stage_preprocess:'Preprocess', stage_preprocess_sub:'Resample to 16 kHz mono', stage_diarize:'Diarize', stage_diarize_sub:'Who spoke when', stage_transcribe:'Transcribe', stage_transcribe_sub:'Speech to text', stage_merge:'Merge', stage_merge_sub:'Align speakers & words', stage_summarize:'Summarize', stage_summarize_sub:'Local LLM summary', tab_transcript:'Transcript', tab_summary:'Summary', sp_panel_title:'Speakers', sp_panel_hint:'Name each voice — labels update everywhere.', sp_name_ph:'Add a name', sp_play:'Play sample', sp_playing:'Playing…', sp_color:'Color', turns_word:'turns', sum_overview:'Overview', sum_key:'Key points', sum_decisions:'Decisions', sum_actions:'Action items', export_transcript:'transcript.md', export_summary:'summary.md', back_word:'Meetings', speaker_word:'Speaker', theme_word:'Theme', sp_close:'Close' },
+    tr: { tagline:'Cihazda toplantı notları', nav_meetings:'Toplantılar', nav_new:'Yeni kayıt', device_status:'Çevrimdışı · cihazda', meetings_title:'Toplantılar', lib_search:'Toplantı ara', speakers_word:'konuşmacı', st_done:'Hazır', st_processing:'İşleniyor', st_queued:'Sırada', st_error:'Hata', new_title:'Yeni kayıt', cap_record:'Kaydet', cap_upload:'Yükle', cap_rec_hint:'Kaydı başlatmak için dokunun — ses bu cihazdan çıkmaz.', cap_recording:'Kaydediliyor…', cap_stop:'Durdur', cap_rec_again:'Tekrar kaydet', cap_drop:'Ses dosyasını buraya bırakın', cap_browse:'veya dosya seçin', cap_formats:'WAV, MP3, M4A · en fazla 2 saat', cap_lang:'Yazıya dökme dili', cap_lang_note:'Dökümün dilini belirler — yukarıdaki arayüz dilinden bağımsızdır.', cap_process:'Cihazda işle', cap_captured:'Kayıt alındı', proc_note:'Modeller tek tek yüklenir — hiçbir veri cihazdan çıkmaz.', proc_done:'Notlar hazır', proc_done_sub:'Döküm ve özet cihazda oluşturuldu.', proc_view:'Sonuçları gör', stage_ingest:'Alım', stage_ingest_sub:'Sesi yükle ve çöz', stage_preprocess:'Ön işleme', stage_preprocess_sub:'16 kHz mono’ya çevir', stage_diarize:'Ayrıştırma', stage_diarize_sub:'Kim ne zaman konuştu', stage_transcribe:'Yazıya dökme', stage_transcribe_sub:'Konuşmadan metne', stage_merge:'Birleştirme', stage_merge_sub:'Konuşmacı ve kelimeleri hizala', stage_summarize:'Özetleme', stage_summarize_sub:'Yerel LLM özeti', tab_transcript:'Döküm', tab_summary:'Özet', sp_panel_title:'Konuşmacılar', sp_panel_hint:'Her sesi adlandırın — etiketler her yerde güncellenir.', sp_name_ph:'İsim ekle', sp_play:'Örnek çal', sp_playing:'Çalıyor…', sp_color:'Renk', turns_word:'konuşma', sum_overview:'Genel bakış', sum_key:'Önemli noktalar', sum_decisions:'Kararlar', sum_actions:'Aksiyon maddeleri', export_transcript:'transcript.md', export_summary:'summary.md', back_word:'Toplantılar', speaker_word:'Konuşmacı', theme_word:'Tema', sp_close:'Kapat' }
+  };
+
+  baseSpeakers = [
+    { id:'s1', color:0, turns:5, sample:'0:04' },
+    { id:'s2', color:1, turns:4, sample:'0:11' },
+    { id:'s3', color:2, turns:3, sample:'0:41' }
+  ];
+
+  UTTER = [
+    { s:'s1', ts:'0:04', text:"Okay, let's get started. Quick round on where we are with the on-device release." },
+    { s:'s2', ts:'0:11', text:'Diarization is the last blocker. It runs, but on the Pi a ten-minute clip takes about four minutes end to end.' },
+    { s:'s1', ts:'0:23', text:'Four minutes is acceptable for batch. Is accuracy holding up with three or more speakers?' },
+    { s:'s2', ts:'0:30', text:'Mostly. Overlapping speech still trips it, but the merge step recovers the words even when the label is off.' },
+    { s:'s3', ts:'0:41', text:"From the UX side, that's exactly why we let people rename and reassign speakers after the fact." },
+    { s:'s1', ts:'0:49', text:'Right. So the flow is: record or upload, process, then review and label the voices.' },
+    { s:'s3', ts:'0:57', text:"I've got the review screen showing a colored card per speaker with a sample clip you can play." },
+    { s:'s2', ts:'1:06', text:"Nice. Playing a three-second sample is the fastest way to tell who's who." },
+    { s:'s1', ts:'1:13', text:'Can you have the labeled transcript export ready by Thursday?' },
+    { s:'s3', ts:'1:19', text:'Yes. Both transcript.md and summary.md, generated on device.' },
+    { s:'s2', ts:'1:27', text:"I'll cut the diarization time down before then — targeting under three minutes for ten." },
+    { s:'s1', ts:'1:35', text:"Great. Let's ship the local path first and benchmark the cloud reference separately." }
+  ];
+
+  SUMMARY = {
+    overview: 'The team reviewed progress on the fully on-device release. Diarization remains the last performance blocker but is accurate enough for batch use, and the speaker-review experience lets users correct labels after processing. The plan is to ship the local pipeline first and benchmark a cloud reference separately.',
+    key: [
+      'A ten-minute clip currently processes in about four minutes on the Raspberry Pi 5.',
+      'Overlapping speech still causes some mislabeling; the merge step recovers the words regardless.',
+      'The review screen shows one colored card per speaker with a playable sample clip.',
+      'Renaming a voice updates the label across the entire transcript and summary.',
+      'Both transcript.md and summary.md are generated entirely on device.'
+    ],
+    decisions: [
+      'Ship the fully-local pipeline first; treat the cloud model only as an accuracy benchmark.',
+      'Keep post-processing speaker renaming and reassignment as a core step.',
+      'Standardize on a three-second voice sample for speaker identification.'
+    ],
+    actions: [
+      { s:'s3', text:'Deliver the labeled transcript and summary export by Thursday.' },
+      { s:'s2', text:'Reduce diarization time to under three minutes for a ten-minute clip.' },
+      { s:'s1', text:'Benchmark the cloud reference separately from the shipped local path.' }
+    ]
+  };
+
+  MEETINGS = [
+    { id:'m1', title:'Weekly Product Sync', date:'Jul 8, 2026', dur:'24:16', status:'done', colors:[0,1,2] },
+    { id:'m2', title:'Design Critique', date:'Jul 7, 2026', dur:'41:02', status:'done', colors:[3,1,4,2] },
+    { id:'m3', title:'1:1 with Priya', date:'Jul 4, 2026', dur:'18:44', status:'done', colors:[4,0] },
+    { id:'m4', title:'Customer Discovery — Erdem Co.', date:'Jul 9, 2026', dur:'—', status:'processing', colors:[2,5] },
+    { id:'m5', title:'Sprint Planning', date:'Jul 9, 2026', dur:'—', status:'queued', colors:[0,1,3] },
+    { id:'m6', title:'Board Prep', date:'Jul 2, 2026', dur:'12:03', status:'error', colors:[1] }
+  ];
+
+  baseStages = ['ingest','preprocess','diarize','transcribe','merge','summarize'];
+  LOGS = {
+    ingest:'ingest · segment_a4f0.wav · 24m16s',
+    preprocess:'preprocess · 16 kHz mono · peak-normalized',
+    diarize:'diarize · sherpa-onnx · found 3 speakers',
+    transcribe:'transcribe · faster-whisper small · 187 words',
+    merge:'merge · aligned 12 turns',
+    summarize:'summarize · Qwen2.5-3B Q4 · 4 sections'
+  };
+
+  rootRef = React.createRef();
+  state = {
+    direction: this.props.direction || 'studio',
+    mode: this.props.mode || 'light',
+    lang: this.props.lang || 'en',
+    screen: 'library', tab: 'transcript', query: '',
+    recording: false, recTime: 0, recBars: new Array(44).fill(7),
+    captured: false, uploadName: '', captureMode: 'record', meetingLang: 'auto',
+    procStage: 0, procProgress: 0, procDone: false, procLogs: [],
+    playing: null, playProg: 0,
+    speakerNames: {}, speakerColorIdx: {},
+    speakersOpen: true,
+    narrow: false
+  };
+
+  componentDidMount() {
+    this.applyTheme();
+    this.onResize();
+    window.addEventListener('resize', this.onResize);
+  }
+  componentDidUpdate(pp, ps) {
+    if (ps.direction !== this.state.direction || ps.mode !== this.state.mode) this.applyTheme();
+  }
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.onResize);
+    clearInterval(this.recTimer); clearInterval(this.waveTimer);
+    clearInterval(this.procTimer); clearInterval(this.playTimer);
+  }
+
+  onResize = () => {
+    const n = window.innerWidth < 900;
+    if (n !== this.state.narrow) this.setState({ narrow: n });
+  };
+
+  tokens() {
+    const d = this.TOK[this.state.direction];
+    const c = d[this.state.mode];
+    return { ...c, radius: d.radius, fd: d.fd, fb: d.fb, fm: d.fm };
+  }
+  applyTheme() {
+    const tk = this.tokens();
+    const map = { '--bg':tk.bg,'--surface':tk.surface,'--surface2':tk.surface2,'--border':tk.border,'--text':tk.text,'--muted':tk.muted,'--faint':tk.faint,'--accent':tk.accent,'--accent-soft':tk.accentSoft,'--accent-text':tk.accentText,'--radius':tk.radius,'--shadow':tk.shadow,'--font-display':tk.fd,'--font-body':tk.fb,'--font-mono':tk.fm };
+    const targets = [document.documentElement, this.rootRef && this.rootRef.current].filter(Boolean);
+    for (const el of targets) for (const k in map) el.style.setProperty(k, map[k]);
+    try { document.body.style.background = tk.bg; document.body.style.color = tk.text; } catch (e) {}
+  }
+
+  mix = (c, p) => `color-mix(in srgb, ${c} ${p}%, transparent)`;
+  initials(name) {
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) return '?';
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  fmt(s) { const m = Math.floor(s / 60); const ss = s % 60; return `${m}:${String(ss).padStart(2,'0')}`; }
+  barsFor(id) {
+    if (!this._bars) this._bars = {};
+    if (this._bars[id]) return this._bars[id];
+    let seed = 7; for (const ch of id) seed = (seed * 31 + ch.charCodeAt(0)) % 9973;
+    const out = [];
+    for (let i = 0; i < 26; i++) { seed = (seed * 1103515245 + 12345) & 0x7fffffff; const env = Math.sin((i / 25) * Math.PI); out.push(Math.round(22 + (seed % 60) * (0.45 + 0.55 * env))); }
+    this._bars[id] = out; return out;
+  }
+  randWave() {
+    return Array.from({ length: 44 }, (_, i) => { const env = Math.sin((i / 43) * Math.PI); return Math.round(9 + Math.random() * 80 * (0.35 + 0.65 * env)); });
+  }
+
+  // ---- navigation ----
+  go = (screen) => this.setState({ screen });
+  goMeetings = () => this.setState({ screen: 'library' });
+  goNew = () => this.setState({ screen: 'capture', captured: false, recording: false, recTime: 0, uploadName: '', recBars: new Array(44).fill(7) });
+  setTabT = () => this.setState({ tab: 'transcript' });
+  setTabS = () => this.setState({ tab: 'summary' });
+  toggleSpeakers = () => this.setState(s => ({ speakersOpen: !s.speakersOpen }));
+  openMeeting = () => this.setState({ screen: 'review', tab: 'transcript' });
+
+  // ---- appearance ----
+  setDirection = (k) => this.setState({ direction: k });
+  toggleTheme = () => this.setState(s => ({ mode: s.mode === 'light' ? 'dark' : 'light' }));
+  setEn = () => this.setState({ lang: 'en' });
+  setTr = () => this.setState({ lang: 'tr' });
+
+  // ---- capture ----
+  setRecordMode = () => this.setState({ captureMode: 'record' });
+  setUploadMode = () => this.setState({ captureMode: 'upload' });
+  onSearch = (e) => this.setState({ query: e.target.value });
+  onMeetingLang = (e) => this.setState({ meetingLang: e.target.value });
+  browseUpload = () => this.setState({ captured: true, uploadName: 'team-standup-2026-07-09.m4a' });
+
+  toggleRec = () => { this.state.recording ? this.stopRec() : this.startRec(); };
+  startRec = () => {
+    this.setState({ recording: true, recTime: 0, captured: false });
+    this.recTimer = setInterval(() => this.setState(s => ({ recTime: s.recTime + 1 })), 1000);
+    this.waveTimer = setInterval(() => this.setState({ recBars: this.randWave() }), 110);
+  };
+  stopRec = () => {
+    clearInterval(this.recTimer); clearInterval(this.waveTimer);
+    this.setState({ recording: false, captured: true, recBars: new Array(44).fill(7) });
+  };
+
+  startProcessing = () => {
+    clearInterval(this.recTimer); clearInterval(this.waveTimer);
+    this.setState({ screen: 'processing', procStage: 0, procProgress: 0, procDone: false, procLogs: [], recording: false });
+    this.procTimer = setInterval(() => {
+      this.setState(s => {
+        let p = s.procProgress + 7;
+        if (p < 100) return { procProgress: p };
+        const key = this.baseStages[s.procStage];
+        const logs = key ? [...s.procLogs, this.LOGS[key]] : s.procLogs;
+        const next = s.procStage + 1;
+        if (next >= this.baseStages.length) { clearInterval(this.procTimer); return { procStage: next, procProgress: 100, procDone: true, procLogs: logs }; }
+        return { procStage: next, procProgress: 0, procLogs: logs };
+      });
+    }, 90);
+  };
+  goReviewResults = () => this.setState({ screen: 'review', tab: 'transcript' });
+
+  // ---- speakers ----
+  rename = (id, val) => this.setState(s => ({ speakerNames: { ...s.speakerNames, [id]: val } }));
+  setColor = (id, idx) => this.setState(s => ({ speakerColorIdx: { ...s.speakerColorIdx, [id]: idx } }));
+  togglePlay = (id) => {
+    if (this.state.playing === id) { clearInterval(this.playTimer); this.setState({ playing: null, playProg: 0 }); return; }
+    clearInterval(this.playTimer);
+    this.setState({ playing: id, playProg: 0 });
+    this.playTimer = setInterval(() => {
+      this.setState(s => { const p = s.playProg + 0.04; if (p >= 1) { clearInterval(this.playTimer); return { playing: null, playProg: 0 }; } return { playProg: p }; });
+    }, 90);
+  };
+
+  // ---- export ----
+  displayName(id, i) { return this.state.speakerNames[id] || `${this.STR[this.state.lang].speaker_word} ${i + 1}`; }
+  nameOf(id) { const i = this.baseSpeakers.findIndex(s => s.id === id); return this.displayName(id, i); }
+  download(name, text) {
+    const blob = new Blob([text], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+  exportTranscript = () => {
+    const lines = ['# Weekly Product Sync — Transcript', '', ...this.UTTER.map(u => `[${u.ts}] ${this.nameOf(u.s)}: ${u.text}`)];
+    this.download('transcript.md', lines.join('\n'));
+  };
+  exportSummary = () => {
+    const S = this.SUMMARY;
+    const out = ['# Weekly Product Sync — Summary', '', '## Overview', S.overview, '', '## Key points', ...S.key.map(k => `- ${k}`), '', '## Decisions', ...S.decisions.map(d => `- ${d}`), '', '## Action items', ...S.actions.map(a => `- **${this.nameOf(a.s)}** — ${a.text}`)];
+    this.download('summary.md', out.join('\n'));
+  };
+
+  statusInfo(status, t, mode) {
+    const map = {
+      done:       { label: t.st_done,       color: mode === 'dark' ? '#6fd47a' : '#3a9142' },
+      processing: { label: t.st_processing, color: 'var(--accent)' },
+      queued:     { label: t.st_queued,     color: 'var(--faint)' },
+      error:      { label: t.st_error,      color: mode === 'dark' ? '#ff7b7b' : '#d64545' }
+    };
+    return map[status] || map.queued;
+  }
+
+  renderVals() {
+    this.applyTheme();
+    const S = this.state;
+    const t = this.STR[S.lang];
+    const pal = this.SPCOL[S.mode];
+    const seg = (a) => a ? { bg:'var(--accent)', fg:'var(--accent-text)', fg2:'var(--accent)' } : { bg:'transparent', fg:'var(--muted)', fg2:'var(--muted)' };
+
+    const speakers = this.baseSpeakers.map((sp, i) => {
+      const ci = S.speakerColorIdx[sp.id] ?? sp.color;
+      const dot = pal[ci];
+      const nm = S.speakerNames[sp.id] || '';
+      const displayName = this.displayName(sp.id, i);
+      const isPlaying = S.playing === sp.id;
+      const raw = this.barsFor(sp.id);
+      const bars = raw.map((h, bi) => ({ h, color: (isPlaying && bi / raw.length <= S.playProg) ? dot : 'var(--border)' }));
+      const swatches = pal.map((c, idx) => ({ dot: c, ring: 'var(--surface)', outline: idx === ci ? 'var(--text)' : 'transparent', onPick: () => this.setColor(sp.id, idx) }));
+      return { id: sp.id, dot, soft: this.mix(dot, 16), name: nm, displayName, placeholder: `${t.speaker_word} ${i + 1}`, initials: this.initials(displayName), turnsLabel: `${sp.turns} ${t.turns_word}`, isPlaying, notPlaying: !isPlaying, bars, swatches, playLabel: isPlaying ? t.sp_playing : t.sp_play, onName: (e) => this.rename(sp.id, e.target.value), onPlay: () => this.togglePlay(sp.id) };
+    });
+    const byId = {}; speakers.forEach(s => byId[s.id] = s);
+
+    const utterances = this.UTTER.map((u, i) => { const s = byId[u.s]; return { id: 'u' + i, ts: u.ts, text: u.text, name: s.displayName, dot: s.dot, soft: s.soft, initials: s.initials }; });
+    const sumActions = this.SUMMARY.actions.map(a => { const s = byId[a.s]; return { text: a.text, name: s.displayName, dot: s.dot, soft: s.soft, initials: s.initials }; });
+
+    const meetings = this.MEETINGS.map(m => {
+      const st = this.statusInfo(m.status, t, S.mode);
+      return { id: m.id, title: m.title, metaLine: `${m.date} · ${m.dur} · ${m.colors.length} ${t.speakers_word}`, stLabel: st.label, stColor: st.color, stSoft: this.mix(st.color, 15), cursor: m.status === 'done' ? 'pointer' : 'default', dots: m.colors.map(ci => pal[ci]), onOpen: m.status === 'done' ? this.openMeeting : null };
+    });
+
+    const directions = ['studio','signal','aurora'].map(k => ({ key: k, label: this.TOK[k].label, dot: this.TOK[k][S.mode].accent, ring: k === S.direction ? 'var(--text)' : 'transparent', onPick: () => this.setDirection(k) }));
+
+    const stages = this.baseStages.map((k, idx) => {
+      let isDone, isActive, isIdle, fill;
+      if (S.procDone || idx < S.procStage) { isDone = true; isActive = false; isIdle = false; fill = '100%'; }
+      else if (idx === S.procStage) { isDone = false; isActive = true; isIdle = false; fill = S.procProgress + '%'; }
+      else { isDone = false; isActive = false; isIdle = true; fill = '0%'; }
+      return { key: k, label: t['stage_' + k], sub: t['stage_' + k + '_sub'], isDone, isActive, isIdle, fill,
+        rowBg: isActive ? 'var(--surface)' : 'transparent', rowBorder: isActive ? 'var(--border)' : 'transparent',
+        iconBg: isDone ? this.mix('#3a9142', 16) : (isActive ? 'var(--accent)' : 'var(--surface2)'),
+        iconFg: isDone ? (S.mode === 'dark' ? '#6fd47a' : '#3a9142') : (isActive ? 'var(--accent-text)' : 'var(--faint)'),
+        labelColor: isIdle ? 'var(--muted)' : 'var(--text)' };
+    });
+
+    return {
+      t, isDark: S.mode === 'dark', isLight: S.mode === 'light',
+      showSidebar: !S.narrow, showBottomNav: S.narrow,
+      isLibrary: S.screen === 'library', isCapture: S.screen === 'capture', isProcessing: S.screen === 'processing', isReview: S.screen === 'review',
+      isTabT: S.tab === 'transcript', isTabS: S.tab === 'summary',
+      speakersOpen: S.speakersOpen, spToggle: S.speakersOpen ? { bg:'var(--accent)', fg:'var(--accent-text)', bd:'var(--accent)' } : { bg:'var(--surface)', fg:'var(--text)', bd:'var(--border)' },
+      contentPadRight: (S.speakersOpen && !S.narrow) ? '312px' : '0px',
+      isRecord: S.captureMode === 'record', isUpload: S.captureMode === 'upload',
+      recording: S.recording, notRecording: !S.recording, captured: S.captured, procDone: S.procDone,
+      query: S.query, meetingLang: S.meetingLang,
+      recTimeStr: this.fmt(S.recTime), recBars: S.recBars.map(h => ({ h, color: S.recording ? 'var(--accent)' : 'var(--border)' })),
+      capturedName: S.captureMode === 'upload' ? (S.uploadName || 'audio.m4a') : `${t.cap_record} · ${this.fmt(S.recTime)}`,
+      meetingTitle: 'Weekly Product Sync', meetingMeta: `Jul 8, 2026 · 24:16 · 3 ${t.speakers_word}`,
+      langEn: seg(S.lang === 'en'), langTr: seg(S.lang === 'tr'),
+      tabT: seg(S.tab === 'transcript'), tabS: seg(S.tab === 'summary'),
+      capRec: seg(S.captureMode === 'record'), capUp: seg(S.captureMode === 'upload'),
+      navMeet: seg(S.screen === 'library'), navNew: seg(S.screen === 'capture'),
+      rootRef: this.rootRef,
+      directions, meetings, speakers, utterances, stages, procLogs: S.procLogs,
+      sumOverview: this.SUMMARY.overview, sumKey: this.SUMMARY.key, sumDecisions: this.SUMMARY.decisions, sumActions,
+      goMeetings: this.goMeetings, goNew: this.goNew, setEn: this.setEn, setTr: this.setTr, toggleTheme: this.toggleTheme,
+      setTabT: this.setTabT, setTabS: this.setTabS, toggleSpeakers: this.toggleSpeakers, setRecordMode: this.setRecordMode, setUploadMode: this.setUploadMode,
+      onSearch: this.onSearch, onMeetingLang: this.onMeetingLang, browseUpload: this.browseUpload, toggleRec: this.toggleRec,
+      startProcessing: this.startProcessing, goReviewResults: this.goReviewResults, exportTranscript: this.exportTranscript, exportSummary: this.exportSummary
+    };
+  }
+}
+</script>
+</body>
+</html>
