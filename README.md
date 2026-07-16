@@ -4,9 +4,9 @@ A fully **local, offline** audio pipeline. It turns a recording (or live mic inp
 speaker-labeled `transcript.md` and an LLM-generated `summary.md`. No audio or text ever
 leaves the device — everything runs on-CPU and is sized to fit a Raspberry Pi 5 (8 GB).
 
-## Web UI
+<h2>Web UI</h2>
+  <img src="web_ui.png" alt="Echoscript Web UI" width="900">
 
-  ![Echoscript Web UI](web_ui.png)
 
 
 ## Data flow
