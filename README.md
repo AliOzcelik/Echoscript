@@ -4,12 +4,17 @@ A fully **local, offline** audio pipeline. It turns a recording (or live mic inp
 speaker-labeled `transcript.md` and an LLM-generated `summary.md`. No audio or text ever
 leaves the device — everything runs on-CPU and is sized to fit a Raspberry Pi 5 (8 GB).
 
+## Web UI
+
+  ![Echoscript Web UI](web_ui.png)
+
+
 ## Data flow
 
 ```
 audio file  ──►  ingest  ──►  preprocess  ──►  diarize ──┐
-(.wav/.mp3/…)                                             ├─► merge ──► transcript.md
-                             ──►  transcribe ─────────────┘              │
+(.wav/.mp3/…)                                            ├─► merge ──► transcript.md
+                           ──►  transcribe ─────────────┘│
                                                                          └─► summarize ──► summary.md
 ```
 
