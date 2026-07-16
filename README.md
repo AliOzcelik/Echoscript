@@ -49,8 +49,9 @@ loads — the Pi cannot hold them all in memory at once.
 ## Usage
 
 ```bash
-source venv/bin/activate       # run all commands from the project root
-pip install -r requirements.txt
+python3 -m venv venv
+source venv/bin/activate
+pip3 install -r requirements.txt
 ```
 
 Download Qwen3.5-2B-Q5_K_M.gguf and place it at: 
