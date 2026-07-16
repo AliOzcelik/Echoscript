@@ -33,12 +33,28 @@ loads — the Pi cannot hold them all in memory at once.
 **Core types:** `AudioData` (samples `[channels, samples]`, sample_rate, source_path),
 `SpeakerTurn` (start, end, speaker), `Transcript` (segments → words), `Utterance` (speaker, start, end, text).
 
+ ## Local LLM Summarization
+
+  Echoscript uses **Qwen3.5-2B Q5_K_M** in GGUF format through
+  `llama-cpp-python` (`llama.cpp`). The model runs locally on the CPU, so
+  transcripts and summaries never leave the device.
+
+  The LLM generates:
+
+  - A meeting overview
+  - Key points
+  - Decisions
+  - Action items
+
 ## Usage
 
 ```bash
 source venv/bin/activate       # run all commands from the project root
 pip install -r requirements.txt
 ```
+
+Download Qwen3.5-2B-Q5_K_M.gguf and place it at: 
+  models/Qwen3.5-2B-Q5_K_M.gguf
 
 `main.py` is a FastAPI server. The browser streams 16 kHz mono int16 PCM over
 `WS /ws/audio`; a WebRTC-VAD segmenter cuts it into utterances, each queued as a job and
@@ -47,6 +63,8 @@ run through the full pipeline. Poll results at `GET /jobs` and `GET /jobs/{job_i
 ```bash
 uvicorn main:app --host 0.0.0.0 --port 8000
 ```
+Summarization runs automatically after transcription. The default configuration uses a 4096-token context, four CPU threads, and generates up to 600 tokens per LLM call.
+
 
 ## Models
 
