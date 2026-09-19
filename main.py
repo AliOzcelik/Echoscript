@@ -1,6 +1,8 @@
 import asyncio
 import webrtcvad
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from hailo_platform import VDevice
 
 import contextlib
@@ -45,6 +47,7 @@ frame_ms = 30           # webrtcvad ONLY accepts 10, 20, or 30 ms frames
 # Derived constants used everywhere below:
 bytes_per_frame = int(sample_rate * frame_ms / 1000) * sample_width  # = 960 bytes
 recordings_dir = Path("recordings")
+frontend_dir = Path(__file__).resolve().parent / "frontend"
 
 
 def write_wav(pcm_bytes, sample_rate, output_dir):
@@ -53,13 +56,13 @@ def write_wav(pcm_bytes, sample_rate, output_dir):
     path = output_dir / f"segment_{job_id}.wav"
     with wave.open(str(path), "wb") as wf:
         wf.setnchannels(1)
-        wf.setsamplewidth(sample_width)
+        wf.setsampwidth(sample_width)
         wf.setframerate(sample_rate)
         wf.writeframes(pcm_bytes)
     return path
 
 
-def run_pipeline(wav_path, transcriber, summarizer):
+def run_pipeline(wav_path, transcriber, summarizer, language):
 
      # ingest
     audio = Audio(wav_path).load_audio()
@@ -75,7 +78,7 @@ def run_pipeline(wav_path, transcriber, summarizer):
     # free the ONNX models, they are not needed after this stage
 
     # transcribe (Whisper stays loaded on the Hailo, so there is nothing to free)
-    transcript = transcriber.transcribe(audio)
+    transcript = transcriber.transcribe(audio, language)
 
     # merge
     utterances = Merge(turns, transcript).merge()
@@ -105,7 +108,7 @@ async def pipeline_worker(app):
             # run_pipeline is blocking CPU work
             # push it off the event loop into a thread
             # so the WebSocket + HTTP endpoints responsive
-            transcript_md, summary_md = await asyncio.to_thread(run_pipeline, Path(job['path']), app.state.transcriber, app.state.summarizer)
+            transcript_md, summary_md = await asyncio.to_thread(run_pipeline, Path(job['path']), app.state.transcriber, app.state.summarizer, job['language'])
             job.update({"status": "done", "transcript": transcript_md, "summary": summary_md})
 
         except Exception as exc:
@@ -117,7 +120,7 @@ async def pipeline_worker(app):
 
 @contextlib.asynccontextmanager
 async def lifespan(app):
-    app.state.jobs = {}   # job_id: {status, path, transcript, summary, error}
+    app.state.jobs = {}   # job_id: {status, path, seconds, created_at, language, transcript, summary, error}
     app.state.queue = asyncio.Queue()
 
     # one VDevice for the whole process: Whisper and the LLM both load onto it once, at startup
@@ -142,10 +145,11 @@ app = FastAPI(title="Local Audio Notes", lifespan=lifespan)
 
 
 # Persist a segment to .wav, register a job, and queue it for processing.
-async def enqueue_segment(app: FastAPI, pcm_bytes: bytes):
+async def enqueue_segment(app: FastAPI, pcm_bytes: bytes, language):
     wav_path = write_wav(pcm_bytes, sample_rate, recordings_dir)
     job_id = wav_path.stem
-    app.state.jobs[job_id] = {"status": "queued", "path": str(wav_path), "transcript": None, "summary": None, "error": None}
+    seconds = round(len(pcm_bytes) / sample_width / sample_rate, 1)
+    app.state.jobs[job_id] = {"status": "queued", "path": str(wav_path), "seconds": seconds, "created_at": time.time(), "language": language, "transcript": None, "summary": None, "error": None}
     await app.state.queue.put(job_id)
     return job_id
 
@@ -159,25 +163,28 @@ async def ws_audio(ws: WebSocket):
     await ws.accept()
     segmenter = SpeechSegment()
 
+    # the UI's language picker sends ?lang=en|tr|auto, anything else lets Whisper detect the language
+    lang = ws.query_params.get("lang")
+    language = lang if lang in ("en", "tr") else None
+
     try:
         while True:
             pcm = await ws.receive_bytes()     # a chunk of audio from the mic
             for segment in segmenter.add_audio(pcm):
-                job_id = await enqueue_segment(ws.app, segment)
-                seconds = round(len(segment) / sample_width / sample_rate, 1)
-                await ws.send_json({"event": "segment_captured", "job_id": job_id, "seconds": seconds})
+                job_id = await enqueue_segment(ws.app, segment, language)
+                await ws.send_json({"event": "segment_captured", "job_id": job_id, "seconds": ws.app.state.jobs[job_id]["seconds"]})
 
     except WebSocketDisconnect:      # don't lose a segment in progress
         tail = segmenter.flush()
         if tail:
-            await enqueue_segment(ws.app, tail)
+            await enqueue_segment(ws.app, tail, language)
 
 
 
-# Compact overview of every job and its status
+# Compact overview of every job, newest first, without the transcripts (the UI fetches those per job)
 @app.get("/jobs")
 def list_jobs(request: Request):
-    return {jid: j["status"] for jid, j in request.app.state.jobs.items()}
+    return [{"id": jid, "status": j["status"], "seconds": j["seconds"], "created_at": j["created_at"]} for jid, j in reversed(request.app.state.jobs.items())]
 
 
 
@@ -188,6 +195,15 @@ def get_job(request: Request, job_id: str):
     if job is None:
         return {"error": "unknown job_id"}
     return job
+
+
+
+# The web UI. Mounted last so the API routes above win over the static files.
+@app.get("/")
+def index():
+    return FileResponse(frontend_dir / "Echoscript.dc.html")
+
+app.mount("/", StaticFiles(directory=frontend_dir))
 
 
 
