@@ -42,6 +42,18 @@ Hardest stages: **[3] diarization** (heaviest, accuracy-sensitive) and **[6] LLM
 > Note: WhisperX bundles ASR+diarization+alignment but pulls in PyTorch/pyannote — great on
 > a desktop (Scenario 1), heavy for a Pi. So: WhisperX on desktop, sherpa-onnx on the SBC.
 
+### Implemented target — Raspberry Pi 5 (16GB) + AI HAT+2 (Hailo-10H)
+
+| Stage | Runs on | Implementation |
+|---|---|---|
+| VAD, ingest, preprocess | CPU | `webrtcvad`, librosa |
+| Diarize | CPU | sherpa-onnx (no Hailo model exists for it) |
+| ASR | **Hailo-10H** | `Whisper-Small.hef` via `hailo_platform.genai.Speech2Text` — segment timestamps only |
+| LLM | **Hailo-10H** | `Qwen2.5-1.5B-Instruct.hef` via `hailo_platform.genai.LLM` — context size fixed by the HEF |
+
+Whisper and the LLM share one `VDevice` opened at server startup and stay loaded; the server
+runs as a single process because the device is exclusive.
+
 ## Scenario 1 — "No hardware" (existing computer, CPU-only)
 
 - **Hardware:** whatever laptop/desktop you already have. No purchase.
@@ -58,10 +70,14 @@ Two tiers, honestly rated:
 | Tier | Board | ~Cost | Reality |
 |---|---|---|---|
 | **Floor** | Raspberry Pi 5, 8GB + NVMe + active cooling | ~$90–130 | CPU-only. whisper.cpp `base` + sherpa-onnx diarization + 3B LLM Q4. Works, but **minutes** to process a short clip; LLM ~2–4 tok/s. |
+| **Implemented** | Raspberry Pi 5, 16GB + AI HAT+2 (Hailo-10H) | — | Whisper + LLM offloaded to the HAT, diarization stays on CPU. See "Implemented target" above. |
 | **Recommended** | **Jetson Orin Nano Super, 8GB** | ~$249 | CUDA GPU → faster-whisper + pyannote on GPU + 3–7B LLM. Several× faster, still tiny + low-power. Best "minimal but real" pick. |
 
 **8GB RAM budget (run sequentially):** Whisper `small` ~0.5GB → diarization ONNX ~0.2GB →
 3B LLM Q4 ~2.3GB. Never co-resident; load → run → free → next stage.
+
+With the AI HAT+2, the Whisper and LLM weights live in the HAT's own memory and no longer
+compete for host RAM; the host only holds the diarization ONNX models.
 
 ## Repo structure (proposed)
 
@@ -103,6 +119,9 @@ note_taking/
 2. **RAM ceiling (8GB).** Mitigation: strict sequential execution, quantized models, swap on NVMe.
 3. **Turkish/multilingual accuracy** needs at least Whisper `small` (`base` may be weak). Test early.
 4. **Long meetings** → chunk audio + map-reduce summarization to fit the LLM context window.
+5. **Hailo model limits.** No word timestamps (a segment with two speakers gets one label), a
+   fixed LLM context, a smaller LLM than the CPU build used, and Turkish support on the Whisper
+   HEFs is untested. Test with a Turkish clip early.
 
 ## Recommended first step
 
