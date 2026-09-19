@@ -17,7 +17,7 @@ from collections import deque
 # stop after sufficient silence
 class SpeechSegment:
 
-        def __init__(self, sample_rate=16000, sample_width=2, frame_ms=30, aggressiveness=2, preroll_ms=300, end_silence_ms=1200, min_segment_ms=8000, max_segment_ms=90000):
+        def __init__(self, sample_rate=16000, sample_width=2, frame_ms=30, aggressiveness=2, preroll_ms=300, end_silence_ms=1200, min_segment_ms=2000, max_segment_ms=90000):
             # Higer aggressiveness eager to call audio 'not speech'
             self.sample_rate = sample_rate
             self.bytes_per_frame = int(sample_rate * frame_ms / 1000) * sample_width
