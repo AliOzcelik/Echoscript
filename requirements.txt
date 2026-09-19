@@ -7,9 +7,9 @@ scipy
 PyYAML
 # note: `dataclasses` is a Python built-in (3.7+) — no package to install
 
-# ASR
-# faster-whisper works on ARM CPU (int8)
-faster-whisper
+# ASR + LLM run on the Hailo-10H (AI HAT+2) through `hailo_platform`.
+# It is not a pip package: install it with `sudo apt install hailo-h10-all`, then create the
+# venv with `python3 -m venv --system-site-packages venv` so it can be imported.
 
 # diarization
 # sherpa-onnx for offline speaker diarization (segmentation + embedding)
@@ -22,6 +22,9 @@ webrtcvad
 # is no longer bundled, so install it explicitly or `import webrtcvad` fails.
 setuptools
 
+# database (SQLite job store in src/database.py)
+sqlalchemy
+
 # web / backend (FastAPI app in main.py, real-time audio over WebSocket)
 fastapi
 uvicorn[standard]   # pulls in the `websockets` lib the /ws/audio endpoint needs
@@ -29,6 +32,3 @@ uvicorn[standard]   # pulls in the `websockets` lib the /ws/audio endpoint needs
 # CLI/UX
 typer
 rich
-
-# LLM Inference
-llama-cpp-python
