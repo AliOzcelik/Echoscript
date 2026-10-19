@@ -1,0 +1,83 @@
+# Echoscript — Step 1: Environment commands
+# Run each task in order and check its output before moving on.
+
+########################################################################
+# TASK 1.1 — System packages
+########################################################################
+sudo apt update
+sudo apt install -y build-essential cmake git ffmpeg python3-venv python3-dev
+
+
+########################################################################
+# TASK 1.2 — Build whisper.cpp
+########################################################################
+git clone https://github.com/ggml-org/whisper.cpp ~/src/whisper.cpp
+cd ~/src/whisper.cpp
+cmake -B build -DCMAKE_BUILD_TYPE=Release -DGGML_NATIVE=ON
+cmake --build build -j4 --config Release
+ls build/bin
+# Check: whisper-cli, whisper-server, whisper-bench, quantize (or whisper-quantize)
+
+
+########################################################################
+# TASK 1.3 — Download model + quantize (q5_0 and q8_0)
+########################################################################
+cd ~/src/whisper.cpp
+sh ./models/download-ggml-model.sh large-v3-turbo
+
+mkdir -p ~/Desktop/Echoscript_manual/models
+./build/bin/quantize models/ggml-large-v3-turbo.bin ~/Desktop/Echoscript_manual/models/ggml-large-v3-turbo-q5_0.bin q5_0
+./build/bin/quantize models/ggml-large-v3-turbo.bin ~/Desktop/Echoscript_manual/models/ggml-large-v3-turbo-q8_0.bin q8_0
+# If the binary is named whisper-quantize, replace "quantize" above.
+# Keep models/ggml-large-v3-turbo.bin (f16) as the quality reference for step 2.
+
+
+########################################################################
+# TASK 1.4 — ONNX models (VAD + speaker embeddings)
+########################################################################
+cd ~/Desktop/Echoscript_manual/models
+wget https://github.com/snakers4/silero-vad/raw/master/src/silero_vad/data/silero_vad.onnx
+wget https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-recongition-models/wespeaker_en_voxceleb_resnet34.onnx
+wget https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-recongition-models/3dspeaker_speech_campplus_sv_en_voxceleb_16k.onnx
+ls -lh
+
+
+########################################################################
+# TASK 1.5 — Python environment
+# (First write requirements.txt yourself: numpy, onnxruntime, soundfile, httpx, jiwer)
+########################################################################
+cd ~/Desktop/Echoscript_manual
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+
+########################################################################
+# TASK 1.6 — Inspect ONNX models
+# (First write tools/inspect_onnx.py yourself)
+########################################################################
+cd ~/Desktop/Echoscript_manual
+source .venv/bin/activate
+python tools/inspect_onnx.py models/*.onnx
+
+
+########################################################################
+# TASK 1.7 — Smoke test with a Turkish clip
+# (Replace your_clip.m4a with your own file)
+########################################################################
+cd ~/Desktop/Echoscript_manual
+mkdir -p data/test
+ffmpeg -i your_clip.m4a -ar 16000 -ac 1 -c:a pcm_s16le data/test/clip16k.wav
+
+~/src/whisper.cpp/build/bin/whisper-cli -m models/ggml-large-v3-turbo-q5_0.bin -f data/test/clip16k.wav -l tr -t 4 -ojf -of data/test/clip16k
+# Check: system_info line shows NEON = 1 and DOTPROD = 1
+# Check: total time at the end vs. clip length
+# Check: data/test/clip16k.json (segments, tokens, timestamps)
+
+
+########################################################################
+# TASK 1.8 — Thermals (run before and during the smoke test)
+########################################################################
+vcgencmd measure_temp
+vcgencmd get_throttled
+# 0x0 = never throttled

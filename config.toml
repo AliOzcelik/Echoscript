@@ -1,0 +1,39 @@
+[paths]
+data_dir = "data/sessions"
+
+[record]
+device = "plughw:CARD=UC150,DEV=0"     # ALSA device of the mic on the Pi; `arecord -L` lists them, e.g. "plughw:CARD=Device,DEV=0"
+
+[vad]
+model          = "models/silero_vad.onnx"
+threshold      = 0.5    # prob >= this -> speech starts
+neg_threshold  = 0.35   # prob < this -> silence (between the two = keep current state)
+min_speech_ms  = 250
+min_silence_ms = 300
+pad_ms         = 200
+
+[stt]
+server_url   = "http://127.0.0.1:8080"
+language     = "tr"
+beam_size    = 1        # 1 = greedy; set from the benchmark
+prompt_chars = 200      # previous text sent as context to the next chunk
+word_time    = "segment"  # "segment" | "dtw" (needs server --dtw -nfa: ~20% slower, not more accurate here)
+max_chunk_ms = 30000    # Whisper's encoder window
+max_gap_ms   = 2000     # a longer silence always ends a chunk (and is skipped)
+timeout_s    = 300
+
+[diar]
+model          = "models/3dspeaker_speech_campplus_sv_en_voxceleb_16k.onnx"   # CAM++: as good as ResNet34, 3x faster (DOCUMENTATION.md §10)
+method         = "spectral"  # "ahc" | "spectral" (finds the speaker count itself; ignores threshold)
+threshold      = 0.65   # ahc (also spectral's fallback below ~15 s of speech): cosine distance where clustering stops; lower = more speakers
+min_cluster_ms = 5000   # a "speaker" with less speech is folded into the closest one
+num_speakers   = 0      # 0 = unknown (estimate); > 0 = force this count
+
+[summary]
+backend     = "hailo"    # "hailo" = Qwen3 on the AI HAT+2 (CPU stays free) | "llama" = llama-server on the CPU
+hailo_model = "~/hailo-rpi5-examples/llm_models/Qwen3-1.7B-Instruct.hef"
+llama_url   = "http://127.0.0.1:8081"   # whisper-server has 8080
+max_tokens  = 600        # longest reply; the transcript gets what is left of the context
+temperature = 0.2
+min_words   = 15         # fewer spoken words: nothing to summarize (the model would invent a meeting)
+timeout_s   = 600
