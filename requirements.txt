@@ -1,0 +1,12 @@
+numpy
+onnxruntime
+soundfile
+httpx
+jiwer
+rapidfuzz
+scipy
+kaldi-native-fbank
+# hailort is not on PyPI: venv/bin/pip install ~/Downloads/hailort-5.4.0-cp313-cp313-linux_aarch64.whl
+fastapi
+uvicorn
+python-multipart

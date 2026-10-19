@@ -1,0 +1,31 @@
+diff --git a/examples/server/server.cpp b/examples/server/server.cpp
+index b745f4d7..0a7bdeaf 100644
+--- a/examples/server/server.cpp
++++ b/examples/server/server.cpp
+@@ -101,6 +101,7 @@ struct whisper_params {
+     bool print_realtime            = false;
+     bool print_progress            = false;
+     bool no_timestamps             = false;
++    bool single_segment            = false; // one decoding pass per request: no re-encode for a short tail
+     bool token_timestamps          = true;
+     bool use_gpu                   = true;
+     bool flash_attn                = true;
+@@ -551,6 +552,10 @@ void get_req_parameters(const Request & req, whisper_params & params)
+     {
+         params.no_timestamps = parse_str_to_bool(req.get_file_value("no_timestamps").content);
+     }
++    if (req.has_file("single_segment"))
++    {
++        params.single_segment = parse_str_to_bool(req.get_file_value("single_segment").content);
++    }
+     if (req.has_file("token_timestamps"))
+     {
+         params.token_timestamps = parse_str_to_bool(req.get_file_value("token_timestamps").content);
+@@ -960,6 +965,7 @@ int main(int argc, char ** argv) {
+             wparams.logprob_thold    = params.logprob_thold;
+ 
+             wparams.no_timestamps    = params.no_timestamps;
++            wparams.single_segment   = params.single_segment;
+             wparams.token_timestamps = params.token_timestamps;
+             wparams.no_context       = params.no_context;
+ 
