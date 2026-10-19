@@ -1,0 +1,11 @@
+     0.0 s  uploaded audio.wav -> 20261019-224447-370b3f (0.2 s)
+     0.2 s  status=processing stage=None side=- summary=None
+     1.2 s  status=processing stage=vad side=- summary=None
+    15.5 s  status=processing stage=stt side=diar:running summary=None
+   240.7 s  status=processing stage=stt side=diar:done summary=None
+  1494.9 s  status=done stage=None side=- summary=running
+  2432.9 s  status=done stage=None side=- summary=done
+log tail: ['0.29  1.00  0.41', '0.21  0.41  1.00', 'diar: 223.2 s | RTF 0.169', 'stt + diar in parallel: waited 0.0 s for diar after stt', '103 utterances', 'merge: 0.0 s | RTF 0.000']
+error: None | summary_error: None
+utterances: 103 | speakers: ['SPK_0', 'SPK_1', 'SPK_2'] | duration_s: 1322.7
+after: throttled=0x0

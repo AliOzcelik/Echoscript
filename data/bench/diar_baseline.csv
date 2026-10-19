@@ -1,0 +1,4 @@
+recording,model,window,step,cmn,vad,method,threshold,linkage,p_ratio,min_cluster,min_turn,merge_gap,speakers,windows,embed_rtf,cluster_s
+htalks_gs_barcelona,resnet34,1500,750,window,system,ahc,0.65,average,-,5000,500,500,23,1381,0.3189,0.1835
+oscar_da_bizi_gorecek_mi,resnet34,1500,750,window,system,ahc,0.65,average,-,5000,500,500,9,1711,0.3901,0.2922
+balkan_asidik,resnet34,1500,750,window,system,ahc,0.65,average,-,5000,500,500,69,2350,0.3684,0.5716
