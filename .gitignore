@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Models: downloaded or built separately (README, "Running it"), ~1.5 GB
+models/
+
+# Meetings and test recordings: personal or third-party audio, and large.
+# data/bench/ stays: the benchmark results DOCUMENTATION.md is built on.
+data/*
+!data/bench/
+recordings/
+
+# Written by HailoRT into the working directory
+hailort.log
+
+# Local backups
+yedek/
+
